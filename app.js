@@ -12,6 +12,7 @@ const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -26,9 +27,11 @@ const userRouter = require("./Routes/user.js");
 const Cookies = require("cookies");
 const { expression } = require("joi");
 const user = require("./models/user.js");
+const { error } = require("console");
 
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+const dbUrl = process.env.ATLASDB_URL;
 
 main()
     .then(() => {
@@ -39,7 +42,7 @@ main()
     });
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
 }
 
 app.engine("ejs", ejsMate); // Register ejs-mate for layout support
@@ -50,9 +53,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret:  process.env.SECRET,
+    },
+    touchAfter: 24 * 3600, // time period in seconds
+});
 const sessionOptions = { 
-    secret: "mysupersecretstring",
+    store,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -64,10 +74,18 @@ const sessionOptions = {
 
 // Root route
 app.get("/", (req, res) => {
-    res.send("Hi, I am root");
+    res.redirect("/listings");
 });
 
+
+
+store.on("error", (err) => {
+    console.log("ERROR IN MONGO SESSION STORE", err);
+});
+
+
 app.use(session(sessionOptions));
+
 app.use(flash());
 
 
@@ -84,15 +102,6 @@ app.use((req, res, next) =>{
     res.locals.currUser = req.user;
     next();
 });
-
-// app.get("/demouser", async (req, res) => {
-//     let fackeUser = new User({
-//         email: "student@gmail.com",
-//         username: "delta-student",
-//     });
-//     let registeredUser = await User.register(fackeUser);
-//     res.send(registeredUser);
-// });
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/review", reviewsRouter);

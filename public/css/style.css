@@ -109,6 +109,12 @@ min-height: 100vh;
     padding-left: 0;
     padding-right: 0;
 }
-.mb-3{
-    
+
+
+/* map */
+#map { 
+    height:400px; 
+    width: 80vh; 
+    border-radius: 30px;
 }
+

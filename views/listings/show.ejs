@@ -1,4 +1,5 @@
-<% layout("/layouts/boilerplate") %>
+"<% layout("/layouts/boilerplate") %>
+
 
 <body>
   <div class="container mt-4">
@@ -79,29 +80,59 @@
         <hr>
         <% } %>
         <!-- All Reviews -->
-                <p><b>All Reviews</b></p>
                 
-                <div class="row">
-                     <% for (let review of listing.reviews) { %>
-                     <div class="card col-5 ms-3 mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">@<%= review.author.username %></h5>
-                                <p class="card-text"> <%= review.comment %></p>
-                                <p 
-                                class="starability-result card-text" 
-                                data-rating="<%= review.rating %>"
-                                ></p>
-                                <form
-                                class="mb-3"
-                                method="POST"
-                                action="/listings/<%= listing._id %>/review/<%= review._id %>?_method=DELETE" 
-                                 >
-                                    <button class="btn btn-sm btn-dark">Delete</button>
-                                </form>
-                            </div>
-                      </div>
-                     <% } %> 
-                </div>
+                <% if( listing.reviews.length > 0 ) { %>
+                    <div class="row">
+                        <p><b>All Reviews</b></p>
+                        <% for (let review of listing.reviews) { %>
+                        <div class="card col-5 ms-3 mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">@<%= review.author.username %></h5>
+                                    <p class="card-text"> <%= review.comment %></p>
+                                    <p 
+                                    class="starability-result card-text" 
+                                    data-rating="<%= review.rating %>"
+                                    ></p>
+                                    <form
+                                    class="mb-3"
+                                    method="POST"
+                                    action="/listings/<%= listing._id %>/review/<%= review._id %>?_method=DELETE" 
+                                    >
+                                        <button class="btn btn-sm btn-dark">Delete</button>
+                                    </form>
+                                </div>
+                        </div>
+                        <% } %> 
+                    </div>
+                    <hr>
+                <% } %>
+                    <div class="col-6 ms-3 mb-3">
+                        <h3>Where you will be</h3>
+                        <div id="map">
+
+                        </div>
+                    </div>
 
   </div>
+<script>
+    mapboxgl.accessToken = "<%= process.env.MAP_TOKEN %>";
+
+    const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>;
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        center: coordinates,
+        zoom: 8
+    });
+
+    new mapboxgl.Marker({color:'red'})
+        .setLngLat(coordinates)
+        .setPopup(
+            new mapboxgl.Popup({ offset: 25 })
+                .setHTML(`<h5><%= listing.title %></h5><p><%= listing.location %></p>`)
+        )
+        .addTo(map);
+</script>
+
 </body>
+
