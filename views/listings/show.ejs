@@ -75,12 +75,12 @@
             </form>
         </div>
         </div>
-        <hr>
         <% } %>
         <!-- All Reviews -->
-                
+                  
                 <% if( listing.reviews.length > 0 ) { %>
-                    <div class="row">
+                    <div class="col-md-8 offset-md-3 row">
+                        <hr>
                         <p><b>All Reviews</b></p>
                         <% for (let review of listing.reviews) { %>
                         <div class="card col-5 ms-3 mb-3">
@@ -98,18 +98,19 @@
                                     >
                                         <button class="btn btn-sm btn-dark">Delete</button>
                                     </form>
+
                                 </div>
                         </div>
                         <% } %> 
                     </div>
-                    <hr>
+                    
                 <% } %>
-                    <div class="col-6 ms-3 mb-3">
-                        <h3>Where you will be</h3>
+                    <div class="col-md-8 offset-md-3 mb-3 ">
+                        <hr>
+                        <h3>Where you will be :)</h3>
                         <div id="map">
                         </div>
                     </div>
-
   </div>
 
 <script>
