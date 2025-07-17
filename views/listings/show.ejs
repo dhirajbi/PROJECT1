@@ -1,14 +1,12 @@
-"<% layout("/layouts/boilerplate") %>
-
+<% layout("layouts/boilerplate") %>
 
 <body>
   <div class="container mt-4">
-
         <!-- Listing Title -->
         <div class="row mb-3">
-        <div class="col-8 offset-2 text-center">
-            <h3><%= listing.title %></h3>
-        </div>
+            <div class="col-8 offset-2 text-center">
+                <h3><%= listing.title %></h3>
+            </div>
         </div>
 
         <!-- Listing Card -->
@@ -109,27 +107,28 @@
                     <div class="col-6 ms-3 mb-3">
                         <h3>Where you will be</h3>
                         <div id="map">
-
                         </div>
                     </div>
 
   </div>
-<script>
-    mapboxgl.accessToken = "<%= process.env.MAP_TOKEN %>";
 
-    const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>;
+<script>
+    const mapToken = "<%= process.env.MAP_TOKEN %>";
+    const listing = <%- JSON.stringify(listing) %>;
+        mapboxgl.accessToken = mapToken;
 
     const map = new mapboxgl.Map({
         container: 'map',
-        center: coordinates,
+        style: 'mapbox://styles/mapbox/streets-v11', 
+        center: listing.geometry.coordinates,
         zoom: 8
     });
 
-    new mapboxgl.Marker({color:'red'})
-        .setLngLat(coordinates)
+    new mapboxgl.Marker({ color: 'red' })
+        .setLngLat(listing.geometry.coordinates)
         .setPopup(
             new mapboxgl.Popup({ offset: 25 })
-                .setHTML(`<h5><%= listing.title %></h5><p><%= listing.location %></p>`)
+                .setHTML(`<h5>${listing.title}</h5><p>${listing.location}</p>`)
         )
         .addTo(map);
 </script>
